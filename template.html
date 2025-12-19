@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Username</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%23fff' font-family='monospace' font-weight='bold'>?</text></svg>">
+    <style>
+        /* ================================================
+           freecrime Profile Template
+           Original design & code by freecrime / existxnce
+           
+           You are free to:
+           • Use this template for your personal profile page
+           • Edit and customize it however you like
+           
+           If you're new to HTML/CSS and need help customizing:
+           • Join our Discord (link in GitHub bio: github.com/freecrime)
+           • Or ask an AI (yes, they have a bad rep sometimes, 
+             but they do a solid job at editing this kind of code)
+           
+           Keep the vibe, spread the love ♡
+           ================================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Removed blurred background image – tip: upload your own bg.gif to GitHub Releases and link it here if desired */
+        /* Example: background-image: url('https://github.com/YOURUSERNAME/YOURREPO/releases/download/v1/bg.gif'); */
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            cursor: pointer;
+            opacity: 1;
+            transition: opacity 0.8s ease;
+        }
+
+        .overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .overlay-text {
+            font-size: 18px;
+            font-weight: 300;
+            letter-spacing: 6px;
+            color: rgba(255, 255, 255, 0.35);
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 420px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+            background: rgba(10, 10, 10, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .uid-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 4px 10px;
+            font-size: 11px;
+            color: #888;
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            cursor: default;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 24px;
+        }
+
+        .uid-badge:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        .uid-text {
+            position: relative;
+            display: inline-block;
+            min-width: 32px;
+            text-align: center;
+        }
+
+        .uid-default,
+        .uid-hover {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 100%;
+            transition: opacity 0.4s ease;
+        }
+
+        .uid-default {
+            opacity: 1;
+        }
+
+        .uid-hover {
+            opacity: 0;
+        }
+
+        .uid-badge:hover .uid-default {
+            opacity: 0;
+        }
+
+        .uid-badge:hover .uid-hover {
+            opacity: 1;
+        }
+
+        /* Volume control */
+        .volume-control-wrapper {
+            position: fixed;
+            top: 20px;
+            right: 16px;
+            z-index: 15;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px;
+            isolation: isolate;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease 0.8s;
+        }
+
+        body.overlay-dismissed .volume-control-wrapper {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .volume-control {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+        }
+
+        .volume-control:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.15);
+        }
+
+        .volume-control svg {
+            width: 14px;
+            height: 14px;
+            fill: #888;
+            transition: fill 0.4s ease;
+        }
+
+        .volume-control:hover svg {
+            fill: #fff;
+        }
+
+        .volume-slider-container {
+            max-width: 0;
+            overflow: hidden;
+            transition: max-width 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .volume-control-wrapper:hover .volume-slider-container {
+            max-width: 100px;
+            opacity: 1;
+        }
+
+        .volume-slider {
+            width: 90px;
+            display: flex;
+            align-items: center;
+        }
+
+        .volume-slider input {
+            width: 100%;
+            height: 4px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .volume-slider input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .volume-slider input:hover::-webkit-slider-thumb {
+            transform: scale(1.2);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 1px solid #222;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.05); /* Placeholder background */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            padding: 8px;
+        }
+
+        /* Tip: Upload your animated/static pfp.gif to GitHub Releases and replace the src below */
+        /* Example: <img src="https://github.com/YOURUSERNAME/YOURREPO/releases/download/v1/pfp.gif" alt="Your Username"> */
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .name {
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: -0.3px;
+        }
+
+        .bio {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            margin-top: 8px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .link {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            transition: all 0.2s ease;
+            opacity: 0.8;
+        }
+
+        .link:hover {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+
+        .link svg {
+            fill: #ffffff;
+            width: 100%;
+            height: 100%;
+        }
+
+        .link img {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Placeholder button example – add more links as needed */
+        /* Tip: Replace href and SVG with your own (e.g., Twitter/X, Instagram, etc.) */
+
+        .tooltip {
+            position: absolute;
+            bottom: -34px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 10px;
+            color: #fff;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .link:hover .tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-4px);
+        }
+
+        .divider {
+            height: 1px;
+            background: #222;
+            margin: 20px 0;
+        }
+
+        .badges {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            margin-top: 12px;
+        }
+
+        .badge {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .badge-inner {
+            position: absolute;
+            inset: 0;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .badge::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 10px;
+            color: #fff;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 20;
+        }
+
+        .badge:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .badge-icon {
+            width: 11px;
+            height: 11px;
+            color: #888;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .badge:hover .badge-icon {
+            color: #fff;
+        }
+
+        /* freecrime Badge – purple theme on hover */
+        .badge.freecrime .badge-inner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(150, 80, 255, 0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+            border-radius: 6px;
+            z-index: 1;
+            opacity: 0;
+        }
+
+        .badge.freecrime:hover .badge-inner::before {
+            transform: translateX(100%);
+            opacity: 1;
+        }
+
+        .badge.freecrime:hover {
+            background: rgba(100, 50, 180, 0.15);
+            border-color: rgba(180, 100, 255, 0.4);
+            box-shadow: 0 0 15px rgba(150, 80, 255, 0.3);
+        }
+
+        .badge.freecrime:hover .badge-icon {
+            color: #c8a2ff;
+            filter: drop-shadow(0 0 8px rgba(180, 100, 255, 0.7));
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .location {
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .location svg {
+            width: 10px;
+            height: 10px;
+            fill: #666;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay" id="overlay">
+        <div class="overlay-text">click me</div>
+    </div>
+
+    <!-- Volume Control (optional – remove if no background music) -->
+    <div class="volume-control-wrapper">
+        <div class="volume-slider-container">
+            <div class="volume-slider">
+                <input type="range" min="0" max="100" value="10" id="volumeSlider">
+            </div>
+        </div>
+        <div class="volume-control">
+            <svg viewBox="0 0 24 24">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="uid-badge">
+            <span class="uid-text">
+                <span class="uid-default">#XXX</span>
+                <span class="uid-hover">UID</span>
+            </span>
+        </div>
+        
+        <div class="profile-header">
+            <div class="avatar">
+                <!-- Tip: Replace with your profile picture -->
+                <!-- Upload pfp.gif to your repo's Releases for a stable link -->
+                <div>PFP HERE<br>(72x72 gif/png)</div>
+            </div>
+            <div class="profile-info">
+                <h1 class="name">Your Username</h1>
+
+                <div class="badges">
+                    <div class="badge freecrime" data-label="freecrime">
+                        <div class="badge-inner"></div>
+                        <svg class="badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8l10-12h-9l1-8z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="bio">
+            Your Role/Title<br>
+            Short description<br>
+            °❀⋆.ೃ࿔*:･°❀⋆.ೃ࿔*:･ <!-- Example cute text – feel free to change -->
+        </p>
+
+        <div class="section">
+            <div class="links">
+                <!-- Example placeholder links – add/replace with your own -->
+                <a href="#" class="link">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <!-- Placeholder SVG (replace with real icon) -->
+                        <circle cx="12" cy="12" r="10"/>
+                    </svg>
+                    <span class="tooltip">Your Link</span>
+                </a>
+                <!-- Add more here -->
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="location">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            Your Location
+        </div>
+    </div>
+
+    <!-- Optional background music – upload song.mp3 to Releases if you want audio -->
+    <audio id="bgMusic" loop>
+        <!-- <source src="https://github.com/YOURUSERNAME/YOURREPO/releases/download/v1/song.mp3" type="audio/mpeg"> -->
+    </audio>
+
+    <script>
+        let audio = document.getElementById('bgMusic');
+        let hasPlayed = false;
+
+        audio.volume = 0.1;
+
+        const overlay = document.getElementById('overlay');
+        overlay.addEventListener('click', function() {
+            if (hasPlayed) return;
+            if (audio.src) audio.play();
+            hasPlayed = true;
+            overlay.classList.add('hidden');
+            document.body.classList.add('overlay-dismissed');
+        });
+
+        const volumeSlider = document.getElementById('volumeSlider');
+        if (volumeSlider) {
+            volumeSlider.addEventListener('input', function() {
+                audio.volume = this.value / 100;
+            });
+        }
+    </script>
+</body>
+</html>
