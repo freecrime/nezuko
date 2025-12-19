@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>nezuko.</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='65' font-size='80' text-anchor='middle' fill='%23ff69b4' font-family='serif'>🌸</text></svg>">
+    <!-- Fixed favicon: Adjusted y position so the emoji is properly centered -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text x='50' y='55' font-size='80' text-anchor='middle' fill='%23ff69b4' font-family='serif'>🌸</text></svg>">
     <style>
         * {
             margin: 0;
@@ -38,7 +39,7 @@
             z-index: 0;
         }
 
-        /* Falling cherry blossoms layer (behind blur overlay, in front of blurred bg) */
+        /* Falling cherry blossoms layer */
         #blossom-container {
             position: fixed;
             inset: 0;
@@ -53,23 +54,27 @@
             height: 30px;
             background: url('https://github.com/freecrime/nezuko./releases/download/002.2/blossom.webp') no-repeat center;
             background-size: contain;
-            opacity: 0.7;
+            opacity: 0.45; /* Reduced opacity for more background feel */
+            filter: blur(1.5px); /* Added blur to make petals look softer and more distant */
             animation: fall linear infinite;
         }
 
         @keyframes fall {
             0% {
-                transform: translateY(-100px) rotate(0deg);
+                transform: translateY(-100px) translateX(0) rotate(0deg);
                 opacity: 0;
             }
             10% {
-                opacity: 0.7;
+                opacity: 0.45;
+            }
+            50% {
+                transform: translateY(50vh) translateX(var(--drift)) rotate(360deg);
             }
             90% {
-                opacity: 0.7;
+                opacity: 0.45;
             }
             100% {
-                transform: translateY(calc(100vh + 100px)) rotate(720deg);
+                transform: translateY(calc(100vh + 100px)) translateX(calc(var(--drift) * 2)) rotate(720deg);
                 opacity: 0;
             }
         }
@@ -640,6 +645,7 @@
     </div>
 
     <div class="container">
+        <!-- ... (container content unchanged) ... -->
         <div class="uid-badge">
             <span class="uid-text">
                 <span class="uid-default">#002</span>
@@ -723,7 +729,7 @@
     </audio>
 
     <script>
-        // Existing audio and overlay code
+        // All your existing script remains the same
         let audio = document.getElementById('bgMusic');
         let hasPlayed = false;
 
@@ -745,7 +751,6 @@
             });
         }
 
-        // Title cycle
         const titles = [
             "nezuko.",
             "ezuko.    n",
@@ -762,7 +767,6 @@
             document.title = titles[titleIndex];
         }, 600);
 
-        // Existing particles canvas code
         const canvas = document.getElementById('particlesCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -820,68 +824,35 @@
         window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
         window.addEventListener('load', () => { resizeCanvas(); initParticles(); animate(); });
 
-        // Falling cherry blossoms
+        // Falling cherry blossoms (unchanged logic)
         const blossomContainer = document.getElementById('blossom-container');
-        const blossomCount = 25; // Adjust for more/less petals
+        const blossomCount = 25;
 
         function createBlossom() {
             const blossom = document.createElement('div');
             blossom.classList.add('blossom');
 
-            // Random horizontal position
             blossom.style.left = Math.random() * 100 + 'vw';
 
-            // Random size (20-40px)
             const size = Math.random() * 20 + 20;
             blossom.style.width = size + 'px';
             blossom.style.height = size + 'px';
 
-            // Random fall duration (10-20s)
             const duration = Math.random() * 10 + 10;
             blossom.style.animationDuration = duration + 's';
 
-            // Random slight horizontal drift
             const drift = Math.random() * 100 - 50;
-            blossom.style.animationName = 'fall';
             blossom.style.setProperty('--drift', drift + 'px');
 
             blossomContainer.appendChild(blossom);
 
-            // Remove after animation ends to prevent DOM bloat
             blossom.addEventListener('animationend', () => {
                 blossom.remove();
             });
         }
 
-        // Add custom drift to keyframes via JS (optional enhancement)
-        const styleSheet = document.styleSheets[0];
-        const keyframes = `
-            @keyframes fall {
-                0% {
-                    transform: translateY(-100px) translateX(0) rotate(0deg);
-                    opacity: 0;
-                }
-                10% {
-                    opacity: 0.7;
-                }
-                50% {
-                    transform: translateY(50vh) translateX(var(--drift)) rotate(360deg);
-                }
-                90% {
-                    opacity: 0.7;
-                }
-                100% {
-                    transform: translateY(calc(100vh + 100px)) translateX(calc(var(--drift) * 2)) rotate(720deg);
-                    opacity: 0;
-                }
-            }
-        `;
-        styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
-
-        // Continuously create new blossoms
         setInterval(createBlossom, 600);
 
-        // Initial burst
         for (let i = 0; i < blossomCount; i++) {
             setTimeout(createBlossom, Math.random() * 2000);
         }
