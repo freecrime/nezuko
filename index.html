@@ -38,6 +38,42 @@
             z-index: 0;
         }
 
+        /* Falling cherry blossoms layer (behind blur overlay, in front of blurred bg) */
+        #blossom-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .blossom {
+            position: absolute;
+            top: -50px;
+            width: 30px;
+            height: 30px;
+            background: url('https://github.com/freecrime/nezuko./releases/download/002.2/blossom.webp') no-repeat center;
+            background-size: contain;
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.7;
+            }
+            90% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
         /* Full-screen blurred overlay with "click me" */
         .overlay {
             position: fixed;
@@ -70,7 +106,7 @@
             max-width: 420px;
             width: 100%;
             position: relative;
-            z-index: 1;
+            z-index: 2;
             background: rgba(20, 10, 20, 0.7); /* slight pink tint */
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 105, 180, 0.2); /* pinkish border */
@@ -582,6 +618,9 @@
     </style>
 </head>
 <body>
+    <!-- Falling cherry blossoms -->
+    <div id="blossom-container"></div>
+
     <div class="overlay" id="overlay">
         <div class="overlay-text">♡</div>
     </div>
@@ -684,6 +723,7 @@
     </audio>
 
     <script>
+        // Existing audio and overlay code
         let audio = document.getElementById('bgMusic');
         let hasPlayed = false;
 
@@ -705,7 +745,7 @@
             });
         }
 
-        // Smooth title cycle for nezuko.
+        // Title cycle
         const titles = [
             "nezuko.",
             "ezuko.    n",
@@ -722,6 +762,7 @@
             document.title = titles[titleIndex];
         }, 600);
 
+        // Existing particles canvas code
         const canvas = document.getElementById('particlesCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -778,6 +819,72 @@
 
         window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
         window.addEventListener('load', () => { resizeCanvas(); initParticles(); animate(); });
+
+        // Falling cherry blossoms
+        const blossomContainer = document.getElementById('blossom-container');
+        const blossomCount = 25; // Adjust for more/less petals
+
+        function createBlossom() {
+            const blossom = document.createElement('div');
+            blossom.classList.add('blossom');
+
+            // Random horizontal position
+            blossom.style.left = Math.random() * 100 + 'vw';
+
+            // Random size (20-40px)
+            const size = Math.random() * 20 + 20;
+            blossom.style.width = size + 'px';
+            blossom.style.height = size + 'px';
+
+            // Random fall duration (10-20s)
+            const duration = Math.random() * 10 + 10;
+            blossom.style.animationDuration = duration + 's';
+
+            // Random slight horizontal drift
+            const drift = Math.random() * 100 - 50;
+            blossom.style.animationName = 'fall';
+            blossom.style.setProperty('--drift', drift + 'px');
+
+            blossomContainer.appendChild(blossom);
+
+            // Remove after animation ends to prevent DOM bloat
+            blossom.addEventListener('animationend', () => {
+                blossom.remove();
+            });
+        }
+
+        // Add custom drift to keyframes via JS (optional enhancement)
+        const styleSheet = document.styleSheets[0];
+        const keyframes = `
+            @keyframes fall {
+                0% {
+                    transform: translateY(-100px) translateX(0) rotate(0deg);
+                    opacity: 0;
+                }
+                10% {
+                    opacity: 0.7;
+                }
+                50% {
+                    transform: translateY(50vh) translateX(var(--drift)) rotate(360deg);
+                }
+                90% {
+                    opacity: 0.7;
+                }
+                100% {
+                    transform: translateY(calc(100vh + 100px)) translateX(calc(var(--drift) * 2)) rotate(720deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
+
+        // Continuously create new blossoms
+        setInterval(createBlossom, 600);
+
+        // Initial burst
+        for (let i = 0; i < blossomCount; i++) {
+            setTimeout(createBlossom, Math.random() * 2000);
+        }
     </script>
 </body>
 </html>
